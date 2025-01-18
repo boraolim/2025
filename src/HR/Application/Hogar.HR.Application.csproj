@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <Nullable>enable</Nullable>
+        <LangVersion>12.0</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <TargetFramework>net8.0</TargetFramework>
+        <AssemblyName>Hogar.HR.Application</AssemblyName>
+        <RootNamespace>Hogar.HR.Application</RootNamespace>
+        <ServerGarbageCollection>true</ServerGarbageCollection>
+        <CheckEolTargetFramework>false</CheckEolTargetFramework>
+        <NoWarn>
+            $(NoWarn);1701;1702;NU1701;1571;1723;1710;1573;1572;0414;0169;1591;0219;8002;AD0001;8618;8765;8604;8625;8601;8600;8062;8619;8602;8603;8604;0618</NoWarn>
+
+        <!-- Assembly information. -->
+        <Version>1.0.0.0</Version>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+        <FileVersion>1.0.0.0</FileVersion>
+        <Company>Bankaool, S.A.</Company>
+        <Authors>Bankaool, S.A., Institución de Banca Múltiple</Authors>
+        <Product>Hogar.HR.Application.dll</Product>
+        <Description>Application Layer Librarty for Clean Architecture Project.</Description>
+        <Copyright>© Olimpo Bonilla Ramírez.. 2016-2024. All rights reserved.</Copyright>
+        <PackageReleaseNotes>Version: 1.0.0.0. Date: 2024/12/05.</PackageReleaseNotes>
+        <PackageTags>CleanArchitecture, CA, Hogar.HR.Application, Hogar.HR.Application.dll</PackageTags>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+
+        <!-- Other additional settings. -->
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <GenerateAssemblyTitleAttribute>true</GenerateAssemblyTitleAttribute>
+        <GenerateAssemblyCompanyAttribute>true</GenerateAssemblyCompanyAttribute>
+        <GenerateAssemblyProductAttribute>true</GenerateAssemblyProductAttribute>
+        <GenerateAssemblyVersionAttribute>true</GenerateAssemblyVersionAttribute>
+        <GenerateAssemblyCopyrightAttribute>true</GenerateAssemblyCopyrightAttribute>
+        <GenerateAssemblyDescriptionAttribute>true</GenerateAssemblyDescriptionAttribute>
+        <GenerateAssemblyConfigurationAttribute>true</GenerateAssemblyConfigurationAttribute>
+    </PropertyGroup>
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <PackageReference Include="MediatR" Version="12.4.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="PDFsharp-MigraDoc" Version="6.1.1" />
+        <PackageReference Include="FluentValidation" Version="11.11.0" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
+        <PackageReference Include="Ardalis.GuardClauses" Version="5.0.0" />
+        <PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="10.7.0.110445">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.2" />
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
+    </ItemGroup>
+    <!-- Project references. -->
+    <ItemGroup>
+        <ProjectReference Include="..\..\Core\Domain\Core.Domain.csproj" />
+        <ProjectReference Include="..\..\Core\Application\Core.Application.csproj" />
+        <ProjectReference Include="..\Domain\Hogar.HR.Domain.csproj" />
+    </ItemGroup>
+</Project>
