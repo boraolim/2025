@@ -1,0 +1,31 @@
+﻿global using System;
+global using System.Net;
+global using System.Linq;
+global using System.Text;
+global using System.Reflection;
+global using System.Threading.Tasks;
+global using System.Collections.Generic;
+global using System.Security.Cryptography;
+global using System.Text.RegularExpressions;
+global using System.ComponentModel.DataAnnotations;
+
+global using Polly;
+global using Serilog;
+global using MediatR;
+global using Asp.Versioning;
+global using Serilog.Context;
+global using Newtonsoft.Json;
+global using FluentValidation;
+global using Ardalis.GuardClauses;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Http;
+global using Newtonsoft.Json.Converters;
+global using Newtonsoft.Json.Serialization;
+global using Microsoft.IdentityModel.Tokens;
+global using Microsoft.AspNetCore.Mvc.Filters;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.AspNetCore.Authentication.JwtBearer;
+
+global using ILoggerMextLog = Microsoft.Extensions.Logging.ILogger;

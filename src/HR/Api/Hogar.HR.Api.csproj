@@ -1,0 +1,76 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <PropertyGroup>
+        <Nullable>enable</Nullable>
+        <LangVersion>11.0</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <TargetFramework>net8.0</TargetFramework>
+        <AssemblyName>Hogar.HR.Api</AssemblyName>
+        <RootNamespace>Hogar.HR.Api</RootNamespace>
+        <ServerGarbageCollection>true</ServerGarbageCollection>
+        <CheckEolTargetFramework>false</CheckEolTargetFramework>
+        <NoWarn>
+            $(NoWarn);1701;1702;NU1701;1571;1723;1710;1573;1572;0414;0169;1591;0219;8002;AD0001;8618;8765;8604;8625;8601;8600;8062;8619;8602;8603;8604;0618
+        </NoWarn>
+
+        <!-- Assembly information. -->
+        <Version>1.0.0.0</Version>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+        <FileVersion>1.0.0.0</FileVersion>
+        <Company>Hogar S.A. de C.V.</Company>
+        <Authors>Olimpo Bonilla Ramírez</Authors>
+        <Product>Hogar.HR.Api.dll</Product>
+        <ActiveDebugProfile>CA.Api.Local</ActiveDebugProfile>
+        <Description>Presentation Layer Library for Clean Architecture Project.</Description>
+        <Copyright>© Olimpo Bonilla Ramírez. 2016-2024. All rights reserved.</Copyright>
+        <PackageReleaseNotes>Version: 1.0.0.0. Date: 2024/01/17.</PackageReleaseNotes>
+        <PackageTags>CleanArchitecture, CA, BancaMovil.WebApi, Hogar.HR.Api.dll</PackageTags>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+
+        <!-- Other additional settings. -->
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <GenerateAssemblyTitleAttribute>true</GenerateAssemblyTitleAttribute>
+        <GenerateAssemblyCompanyAttribute>true</GenerateAssemblyCompanyAttribute>
+        <GenerateAssemblyProductAttribute>true</GenerateAssemblyProductAttribute>
+        <GenerateAssemblyVersionAttribute>true</GenerateAssemblyVersionAttribute>
+        <GenerateAssemblyCopyrightAttribute>true</GenerateAssemblyCopyrightAttribute>
+        <GenerateAssemblyDescriptionAttribute>true</GenerateAssemblyDescriptionAttribute>
+        <GenerateAssemblyConfigurationAttribute>true</GenerateAssemblyConfigurationAttribute>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+        <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
+        <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
+        <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
+        <PackageReference Include="Asp.Versioning.Http" Version="8.1.0" />
+        <PackageReference Include="Ardalis.GuardClauses" Version="5.0.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
+        <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="10.7.0.110445">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+        <PackageReference Include="Serilog.Enrichers.ClientInfo" Version="2.1.2" />
+        <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
+        <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.11" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.12" />
+    </ItemGroup>
+    <!-- Project references. -->
+    <ItemGroup>
+        <ProjectReference Include="..\..\Core\Domain\Core.Domain.csproj" />
+        <ProjectReference Include="..\..\Core\Application\Core.Application.csproj" />
+        <ProjectReference Include="..\..\Core\Infrastructure\Core.Infrastructure.csproj" />
+        <ProjectReference Include="..\Domain\Hogar.HR.Domain.csproj" />
+        <ProjectReference Include="..\Application\Hogar.HR.Application.csproj" />
+        <ProjectReference Include="..\Persistence\Hogar.HR.Persistence.csproj" />
+        <ProjectReference Include="..\Common\Hogar.HR.Common.csproj" />
+    </ItemGroup>
+</Project>
