@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <Nullable>enable</Nullable>
+        <LangVersion>12.0</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <TargetFramework>net8.0</TargetFramework>
+        <AssemblyName>Hogar.HR.Common</AssemblyName>
+        <RootNamespace>Hogar.HR.Common</RootNamespace>
+        <ServerGarbageCollection>true</ServerGarbageCollection>
+        <CheckEolTargetFramework>false</CheckEolTargetFramework>
+        <NoWarn>
+            $(NoWarn);1701;1702;NU1701;1571;1723;1710;1573;1572;0414;0169;1591;0219;8002;AD0001;8618;8765;8604;8625;8601;8600;8062;8619;8602;8603;8604;0618</NoWarn>
+
+        <!-- Assembly information. -->
+        <Version>1.0.0.0</Version>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+        <FileVersion>1.0.0.0</FileVersion>
+        <Company>Bankaool, S.A.</Company>
+        <Authors>Bankaool, S.A., Institución de Banca Múltiple</Authors>
+        <Product>Hogar.HR.Common.dll</Product>
+        <Description>Infrastructure Layer Library for Clean Architecture Project.</Description>
+        <Copyright>© Olimpo Bonilla Ramírez.. 2016-2024. All rights reserved.</Copyright>
+        <PackageReleaseNotes>Version: 1.0.0.0. Date: 2024/12/05.</PackageReleaseNotes>
+        <PackageTags>CleanArchitecture, CA, Hogar.HR.Common, Hogar.HR.Common.dll</PackageTags>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+
+        <!-- Other additional settings. -->
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <GenerateAssemblyTitleAttribute>true</GenerateAssemblyTitleAttribute>
+        <GenerateAssemblyCompanyAttribute>true</GenerateAssemblyCompanyAttribute>
+        <GenerateAssemblyProductAttribute>true</GenerateAssemblyProductAttribute>
+        <GenerateAssemblyVersionAttribute>true</GenerateAssemblyVersionAttribute>
+        <GenerateAssemblyCopyrightAttribute>true</GenerateAssemblyCopyrightAttribute>
+        <GenerateAssemblyDescriptionAttribute>true</GenerateAssemblyDescriptionAttribute>
+        <GenerateAssemblyConfigurationAttribute>true</GenerateAssemblyConfigurationAttribute>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Polly" Version="8.5.2" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.2" />
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="10.7.0.110445">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.2.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.2" />
+    </ItemGroup>
+    <!-- Project references. -->
+    <ItemGroup>
+        <ProjectReference Include="..\..\Core\Application\Core.Application.csproj" />
+        <ProjectReference Include="..\Domain\Hogar.HR.Domain.csproj" />
+        <ProjectReference Include="..\Persistence\Hogar.HR.Persistence.csproj" />
+    </ItemGroup>
+</Project>
