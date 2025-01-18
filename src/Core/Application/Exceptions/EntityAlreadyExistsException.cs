@@ -1,0 +1,6 @@
+﻿namespace Core.Application.Exceptions;
+
+public class EntityAlreadyExistsException : Exception
+{
+    public EntityAlreadyExistsException(string message) : base(message) { HResult = -50; }
+}
