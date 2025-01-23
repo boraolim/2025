@@ -16,8 +16,8 @@ namespace WebHooks.Api.Infrastructure.Middleware;
 
 public sealed class ErrorHandlerMiddleware : IMiddleware
 {
-    private string RequestText { get; set; }
-    private string ResponseText { get; set; }
+    private string RequestBodyText { get; set; }
+    private string ResponseBodyText { get; set;  }
 
     private readonly IJsonToStringHelper<Result<string>> _jsonHelper;
     public ErrorHandlerMiddleware(IJsonToStringHelper<Result<string>> jsonHelper, IHostEnvironment env) =>
@@ -26,9 +26,9 @@ public sealed class ErrorHandlerMiddleware : IMiddleware
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         var originalBodyStream = context.Response.Body;
-        RequestText = await GetRequestResult(context.Request);
+        RequestBodyText = await GetRequestResult(context.Request);
 
-        using (var responseBody = new MemoryStream())
+        using(var responseBody = new MemoryStream())
         {
             context.Response.Body = responseBody;
 
@@ -36,7 +36,7 @@ public sealed class ErrorHandlerMiddleware : IMiddleware
             {
                 await next(context);
             }
-            catch (Exception error)
+            catch(Exception error)
             {
                 context.Response.Clear();
                 context.Response.ContentType = MainConstantsCore.CFG_CONTENT_TYPE_JSON;
@@ -47,7 +47,7 @@ public sealed class ErrorHandlerMiddleware : IMiddleware
                 responseModel.TraceId = context.Request.Headers[MainConstantsCore.CFG_TRACE_ID_HEADER];
                 responseModel.UrlPathDetail = string.Format(MessageConstantsCore.MSG_URL_PATH_DETAIL, context.Request.Path, context.Request.Method);
 
-                switch (error)
+                switch(error)
                 {
                     case CommonValidationException e:
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -89,12 +89,12 @@ public sealed class ErrorHandlerMiddleware : IMiddleware
                         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                         break;
                 }
-
+                
                 responseModel.StatusCode = context.Response.StatusCode;
                 await context.Response.WriteAsync(_jsonHelper.SerializeToString(responseModel));
             }
 
-            ResponseText = await GetResponseResult(context.Response);
+            ResponseBodyText = await GetResponseResult(context.Response);
             await responseBody.CopyToAsync(originalBodyStream);
         }
 
@@ -112,7 +112,7 @@ public sealed class ErrorHandlerMiddleware : IMiddleware
             var body = request.Body;
             var buffer = new byte[Convert.ToInt32(request.ContentLength)];
 
-            while ((read = await request.Body.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            while((read = await request.Body.ReadAsync(buffer, 0, buffer.Length)) > 0)
                 await ms.WriteAsync(buffer, 0, read);
 
             var bodyAsText = Encoding.UTF8.GetString(ms.ToArray());
@@ -125,10 +125,10 @@ public sealed class ErrorHandlerMiddleware : IMiddleware
                 _ => !string.IsNullOrEmpty(bodyAsText) ? bodyAsText : string.Empty
             };
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
             return string.Concat(MessageConstantsCore.CFG_TEXT_RESULT_ERROR,
-                (ex.InnerException == null) ? ex.Message : string.Format(MainConstantsCore.CFG_SEPATOR_ERROR,
+                (ex.InnerException == null) ? ex.Message : string.Format(MainConstantsCore.CFG_SEPATOR_ERROR, 
                     ex.Message, ex.InnerException.Message));
         }
     }
@@ -143,7 +143,7 @@ public sealed class ErrorHandlerMiddleware : IMiddleware
 
             return string.IsNullOrEmpty(textResponse) ? string.Empty : textResponse;
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
             return string.Concat(MessageConstantsCore.CFG_TEXT_RESULT_ERROR,
                 (ex.InnerException == null) ? ex.Message : string.Format(MainConstantsCore.CFG_SEPATOR_ERROR,

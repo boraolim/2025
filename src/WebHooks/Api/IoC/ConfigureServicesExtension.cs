@@ -19,7 +19,6 @@ using Core.Application.Implementations.Helpers;
 
 using MainConstantsCore = Core.Domain.Constants.MainConstants;
 
-
 namespace WebHooks.Api.IoC;
 
 public static class ConfigureServicesExtension
@@ -34,6 +33,7 @@ public static class ConfigureServicesExtension
         services.AddTransient<JwtValidationMiddleware>();
         services.AddTransient<ErrorHandlerMiddleware>();
         services.AddTransient<TraceIdDetectionMiddleware>();
+        services.AddScoped<ResilientActionFilter>();
 
         var environmentReader = new EnvironmentReader();
         var jwtSettings = configuration.GetSection(MainConstantsCore.CFG_JWT_VALUES).Get<JwtSettings>();
@@ -41,7 +41,7 @@ public static class ConfigureServicesExtension
         var cifrado = new CypherAes(apiKeyEnv);
 
         byte[] TokenKeyWebApi;
-        using(var itemHash = SHA256.Create())
+        using (var itemHash = SHA256.Create())
         {
             TokenKeyWebApi = itemHash.ComputeHash(Convert.FromBase64String(apiKeyEnv));
         }
@@ -79,6 +79,7 @@ public static class ConfigureServicesExtension
 
         services.AddControllers(options =>
         {
+            options.Filters.Add<ResilientActionFilter>();
             options.Filters.Add<ApiResultFilterAttribute>();
         }).AddNewtonsoftJson(options =>
         {

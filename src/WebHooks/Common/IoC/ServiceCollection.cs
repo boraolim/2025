@@ -41,51 +41,7 @@ public static class ServiceRegistration
         services.AddMemoryCache();
         services.AddSingleton<IAsyncCacheProvider, MemoryCacheProvider>();
         services.AddSingleton<ISyncCacheProvider, MemoryCacheProvider>();
-
-        var pollySettings = configuration.GetSection(MainConstantsCore.CFG_POLLY_VALUES).Get<PollySettings>();
-
-        services.AddSingleton<IPolicyRegistry<string>>(sp =>
-        {
-            var registry = new PolicyRegistry();
-            var memoryCache = sp.GetRequiredService<IMemoryCache>();
-            IAsyncCacheProvider cacheProvider = new MemoryCacheProvider(memoryCache);
-
-            var cachePolicy = Policy.CacheAsync(cacheProvider, TimeSpan.FromSeconds(pollySettings.CacheDurationInMinutes));
-
-            registry.Add(MainConstantsLocal.CFG_CACHE_POLICY, cachePolicy);
-
-            var retryPolicy = Policy.Handle<HttpRequestException>()
-                .OrResult<HttpResponseMessage>(response => !response.IsSuccessStatusCode)
-                .WaitAndRetryAsync(pollySettings.RetryCount, retryAttempt =>
-                {
-                    var delay = TimeSpan.FromSeconds(pollySettings.RetryDelayInSeconds * retryAttempt);
-                    return delay;
-                });
-
-            registry.Add(MainConstantsLocal.CFG_RETRY_POLICY, retryPolicy);
-
-            var circuitBreakerPolicy = Policy.Handle<HttpRequestException>()
-                .OrResult<HttpResponseMessage>(response => !response.IsSuccessStatusCode)
-                .CircuitBreakerAsync(
-                    handledEventsAllowedBeforeBreaking: pollySettings.CircuitBraker.FailureThreshold,
-                    durationOfBreak: TimeSpan.FromSeconds(pollySettings.CircuitBraker.BreakDurationInSeconds));
-
-            registry.Add(MainConstantsLocal.CFG_CIRCUIT_BRAKER_POLICY, circuitBreakerPolicy);
-            return registry;
-        });
-
-        services.AddHttpClient("MyHttpClient", client =>
-        {
-            client.BaseAddress = new Uri(pollySettings.BaseUrl);
-            client.DefaultRequestHeaders.Add(MainConstantsCore.CFG_HEADER_ACCEPT, MainConstantsCore.CFG_CONTENT_TYPE_JSON);
-        }).AddPolicyHandlerFromRegistry((policyRegistry, HttpRequestMessage) =>
-        {
-            var cachePolicy = policyRegistry.Get<IAsyncPolicy<HttpResponseMessage>>(MainConstantsLocal.CFG_CACHE_POLICY);
-            var retryPolicy = policyRegistry.Get<IAsyncPolicy<HttpResponseMessage>>(MainConstantsLocal.CFG_RETRY_POLICY);
-            var circuitBreakerPolicy = policyRegistry.Get<IAsyncPolicy<HttpResponseMessage>>(MainConstantsLocal.CFG_CIRCUIT_BRAKER_POLICY);
-
-            return Policy.WrapAsync(cachePolicy, retryPolicy, circuitBreakerPolicy);
-        });
+        services.AddSingleton<IResilienceService, ResilienceService>();
 
         var _assembly = Assembly.GetExecutingAssembly();
         var _getRepositoryList = _assembly.GetTypes()
