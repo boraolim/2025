@@ -270,8 +270,14 @@ USE HR;
 
 -- Root acount.
 INSERT INTO HR.TBL_USERS (user_name, user_secret, user_full_name, flag_state, user_add_date)
-VALUES('root', HEX('Password cyphered here in AES256-GCM'), 'ADMINISTRADOR DEL SISTEMA', 'ACTIVE', 'root');
+VALUES('root', 'Password cyphered here in AES256-GCM', 'ADMINISTRADOR DEL SISTEMA', 'ACTIVE', 'root');
 UPDATE HR.TBL_USERS SET user_add_date = credential_id WHERE (user_name = 'root');
+
+COMMIT;
+
+-- Parameters.
+INSERT INTO HR.TBL_PARAMETERS(parameter_description, value_parameter, user_add_date)
+VALUES ('CFG_EXPIRATION_TOKEN_MINUTES', '15', 'SYSTEM');
 
 COMMIT;
 
@@ -791,10 +797,12 @@ CREATE PROCEDURE IF NOT EXISTS `HR`.`proc_save_new_token`(IN `p_user_name`      
                                                           IN `p_user_date`           VARCHAR(255))
 BEGIN
     DECLARE max_user_id INTEGER DEFAULT 0;
+    DECLARE time_expiration VARCHAR(255) DEFAULT '';
     DECLARE current_credential_id CHAR(36);
     SELECT COUNT(*) INTO max_user_id FROM HR.TBL_USERS WHERE (user_name = p_user_name);
+    SELECT t1.value_parameter INTO time_expiration FROM HR.TBL_PARAMETERS t1 WHERE (t1.parameter_description = 'CFG_EXPIRATION_TOKEN_MINUTES');
 
-    IF (max_user_id > 0) THEN
+    IF (max_user_id > 0 AND time_expiration > 0) THEN
         -- Actualizo la fecha de refresco del token.
         UPDATE HR.TBL_USERS t1
            SET t1.last_refresh_date = CURRENT_TIMESTAMP(),
@@ -811,7 +819,7 @@ BEGIN
 
         -- Guardo el nuevo token generado.
         INSERT INTO HR.TBL_USER_TOKENS (credential_id, token_value, expiration_date, ip_address, flag_state, user_add_date)
-        VALUES(current_credential_id, p_new_refresh, DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 5 MINUTE), p_ip_address, 'ACTIVE', p_user_date);
+        VALUES(current_credential_id, p_new_refresh, DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL time_expiration MINUTE), p_ip_address, 'ACTIVE', p_user_date);
 
         -- Muestro el identificador del token generado.
         SELECT t1.id_token AS IdToken
@@ -836,11 +844,13 @@ CREATE PROCEDURE IF NOT EXISTS `HR`.`proc_save_refresh_token`(IN `p_id_token`   
                                                               IN `p_ip_address`          VARCHAR(100),
                                                               IN `p_user_date`           VARCHAR(255))
 BEGIN
-        DECLARE max_user_id INTEGER DEFAULT 0;
+    DECLARE max_user_id INTEGER DEFAULT 0;
+    DECLARE time_expiration VARCHAR(255) DEFAULT '';
     DECLARE current_credential_id CHAR(36);
     SELECT COUNT(*) INTO max_user_id FROM HR.TBL_USERS WHERE (user_name = p_user_name);
+    SELECT t1.value_parameter INTO time_expiration FROM HR.TBL_PARAMETERS WHERE (parameter_description = 'CFG_EXPIRATION_TOKEN_MINUTES');
 
-    IF (max_user_id > 0) THEN
+    IF (max_user_id > 0 AND time_expiration > 0) THEN
             -- Actualizo la fecha de refresco del token.
         UPDATE HR.TBL_USERS t1
            SET t1.last_refresh_date = CURRENT_TIMESTAMP(),
@@ -858,7 +868,7 @@ BEGIN
         -- Actualizo el token nuevo.
         UPDATE HR.TBL_USER_TOKENS t1
            SET t1.token_value = p_new_refresh,
-               t1.expiration_date = DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 5 MINUTE),
+               t1.expiration_date = DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL time_expiration MINUTE),
                t1.ip_address = p_ip_address,
                t1.flag_state = 'ACTIVE',
                t1.updated_at = CURRENT_TIMESTAMP(),
@@ -923,5 +933,24 @@ END$$
 DELIMITER ;
 
 COMMIT;
+
+-- Events.
+SHOW VARIABLES LIKE 'event_scheduler';
+SET GLOBAL event_scheduler = ON;
+
+CREATE EVENT IF NOT EXISTS HR.EVT_STATUS_TOKEN
+ON SCHEDULE EVERY 5 MINUTE
+DO
+    UPDATE HR.tbl_user_tokens t1
+       SET t1.flag_state = 'DELETED',
+           t1.user_delete_date = 'SYSTEM',
+           t1.deleted_at = CURRENT_TIMESTAMP()
+     WHERE (t1.expiration_date < CURRENT_TIMESTAMP());
+
+CREATE EVENT IF NOT EXISTS HR.EVT_DELETE_TOKEN
+ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 DAY
+DO
+    DELETE FROM HR.tbl_users_tokens
+     WHERE (expiration_date < CURRENT_TIMESTAMP());
 
 -- Fin del script.

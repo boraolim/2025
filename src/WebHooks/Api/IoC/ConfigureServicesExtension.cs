@@ -41,7 +41,7 @@ public static class ConfigureServicesExtension
         var cifrado = new CypherAes(apiKeyEnv);
 
         byte[] TokenKeyWebApi;
-        using (var itemHash = SHA256.Create())
+        using(var itemHash = SHA256.Create())
         {
             TokenKeyWebApi = itemHash.ComputeHash(Convert.FromBase64String(apiKeyEnv));
         }
