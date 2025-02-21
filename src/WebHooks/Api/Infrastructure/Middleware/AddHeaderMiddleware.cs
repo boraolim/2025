@@ -1,6 +1,7 @@
 ﻿using Serilog.Context;
 
 using MainConstantsCore = Core.Domain.Constants.MainConstants;
+using FormatConstantsCore = Core.Domain.Constants.FormatConstants;
 
 namespace WebHooks.Api.Infrastructure.Middleware;
 
@@ -11,7 +12,7 @@ public sealed class AddHeaderMiddleware : IMiddleware
         var customHeader = context.Request.Headers[MainConstantsCore.CFG_TRACE_ID_HEADER].ToString();
 
         using(LogContext.PushProperty(MainConstantsCore.CFG_TRACE_ID_LABEL_SERILOG,
-            string.Format(MainConstantsCore.CFG_TRACE_ID_IN_MESSAGE_LOG, customHeader)))
+            string.Format(FormatConstantsCore.CFG_TRACE_ID_IN_MESSAGE_LOG, customHeader)))
         {
             await next(context);
         }

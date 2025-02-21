@@ -1,11 +1,8 @@
 ﻿using System.Reflection;
 using System.Text.RegularExpressions;
 
-using Polly;
 using Polly.Caching;
-using Polly.Registry;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
 using Core.Domain.Common;
@@ -16,9 +13,8 @@ using Core.Application.Abstractions.Security;
 using Core.Application.Implementations.Helpers;
 using Core.Application.Implementations.Management;
 
-using MainConstantsCore = Core.Domain.Constants.MainConstants;
 using RegexConstantsCore = Core.Domain.Constants.RegexConstants;
-using MainConstantsLocal = WebHooks.Domain.Constants.MainConstants;
+using EnvironmentConstantsCore = Core.Domain.Constants.EnvironmentConstants;
 
 namespace WebHooks.Common.IoC;
 
@@ -26,16 +22,16 @@ public static class ServiceRegistration
 {
     public static IServiceCollection AddWebHooksCommon(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<PaginationSettings>(options => configuration.GetSection(MainConstantsCore.CFG_PAGINATION_VALUES).Bind(options));
-        services.Configure<PerformanceSettings>(options => configuration.GetSection(MainConstantsCore.CFG_PERFORMANCE_VALUES).Bind(options));
-        services.Configure<JwtSettings>(options => configuration.GetSection(MainConstantsCore.CFG_JWT_VALUES).Bind(options));
-        services.Configure<PollySettings>(options => configuration.GetSection(MainConstantsCore.CFG_POLLY_VALUES).Bind(options));
+        services.Configure<PaginationSettings>(options => configuration.GetSection(EnvironmentConstantsCore.CFG_PAGINATION_VALUES).Bind(options));
+        services.Configure<PerformanceSettings>(options => configuration.GetSection(EnvironmentConstantsCore.CFG_PERFORMANCE_VALUES).Bind(options));
+        services.Configure<JwtSettings>(options => configuration.GetSection(EnvironmentConstantsCore.CFG_JWT_VALUES).Bind(options));
+        services.Configure<PollySettings>(options => configuration.GetSection(EnvironmentConstantsCore.CFG_POLLY_VALUES).Bind(options));
 
         services.AddScoped<IEnvironmentReader, EnvironmentReader>();
         services.AddScoped<ICypherAes>(sp =>
         {
             var environmentReader = sp.GetRequiredService<IEnvironmentReader>();
-            return new CypherAes(new string(environmentReader.GetVariable(MainConstantsCore.CFG_BASE_KEY_WEBHOOK_APP).MessageDescription.Take(32).ToArray()));
+            return new CypherAes(new string(environmentReader.GetVariable(EnvironmentConstantsCore.CFG_BASE_KEY_WEBHOOK_APP).MessageDescription.Take(32).ToArray()));
         });
 
         services.AddMemoryCache();

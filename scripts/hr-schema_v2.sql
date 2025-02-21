@@ -270,7 +270,7 @@ USE HR;
 
 -- Root acount.
 INSERT INTO HR.TBL_USERS (user_name, user_secret, user_full_name, flag_state, user_add_date)
-VALUES('root', 'Password cyphered here in AES256-GCM', 'ADMINISTRADOR DEL SISTEMA', 'ACTIVE', 'root');
+VALUES('root', HEX('Password cyphered here in AES256-GCM'), 'ADMINISTRADOR DEL SISTEMA', 'ACTIVE', 'root');
 UPDATE HR.TBL_USERS SET user_add_date = credential_id WHERE (user_name = 'root');
 
 COMMIT;

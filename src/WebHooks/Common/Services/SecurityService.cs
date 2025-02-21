@@ -17,8 +17,10 @@ using WebHooks.Application.Abstractions.Services;
 using WebHooks.Application.Abstractions.Persistence;
 
 using MainConstantsCore = Core.Domain.Constants.MainConstants;
+using FormatConstantsCore = Core.Domain.Constants.FormatConstants;
 using MainConstantsLocal = WebHooks.Domain.Constants.MainConstants;
 using MessageConstantsLocal = WebHooks.Domain.Constants.MessageConstants;
+using EnvironmentConstantsCore = Core.Domain.Constants.EnvironmentConstants;
 
 namespace WebHooks.Common.Services;
 
@@ -55,7 +57,7 @@ public class SecurityService : ISecurityService
 
     private void ReadValues()
     {
-        SecretKey = new string(_environmentReader.GetVariable(MainConstantsCore.CFG_BASE_KEY_WEBHOOK_APP).MessageDescription.ToArray());
+        SecretKey = new string(_environmentReader.GetVariable(EnvironmentConstantsCore.CFG_BASE_KEY_WEBHOOK_APP).MessageDescription.ToArray());
         KeyAPILocal = new string(SecretKey.Take(32).ToArray());
     }
 
@@ -83,7 +85,7 @@ public class SecurityService : ISecurityService
             throw new UnauthorizedAccessException(MessageConstantsLocal.MSG_USER_INACTIVE);
 
         var refreshTokenData = await _jwtService.GenerateTokenAsync(credential.UserName, clientNode, MainConstantsCore.CFG_SYSTEM_AUTHOR);
-        var arrayRefresh = refreshTokenData.Split(MainConstantsCore.CFG_VALUE_PIPE);
+        var arrayRefresh = refreshTokenData.Split(FormatConstantsCore.CFG_VALUE_PIPE);
         var newTokenSettings = new JwtValueDto()
         {
             UserName = credential.UserName,
@@ -95,7 +97,7 @@ public class SecurityService : ISecurityService
         };
         var newToken = await _jwtService.GenerateNewTokenAsync(newTokenSettings);
 
-        _cacheService.PutInCache(string.Format(MainConstantsCore.CFG_SESSION_ID, newTokenSettings.IdClient.ToString()),
+        _cacheService.PutInCache(string.Format(FormatConstantsCore.CFG_SESSION_ID, newTokenSettings.IdClient.ToString()),
             _cypherAes.AESEncryptionGCM(JsonSerializer.Serialize(new SessionCurrent()
             {
                 UserId = newTokenSettings.IdClient.ToString(),
@@ -132,7 +134,7 @@ public class SecurityService : ISecurityService
             throw new CustomException(MessageConstantsLocal.MSG_TOKEN_EXPIRED_MISMATCH);
 
         string resultUpdated = await UpdateRefreshToken(tokenId, userName, isExpiredFromDb, _currentUserService.IpAddress, _currentUserService.UserId);
-        var arrayTokens = resultUpdated.Split(MainConstantsCore.CFG_VALUE_PIPE);
+        var arrayTokens = resultUpdated.Split(FormatConstantsCore.CFG_VALUE_PIPE);
 
         var newTokenSettings = new JwtValueDto()
         {
@@ -145,7 +147,7 @@ public class SecurityService : ISecurityService
         };
         var newToken = await _jwtService.GenerateNewTokenAsync(newTokenSettings);
 
-        _cacheService.PutInCache(string.Format(MainConstantsCore.CFG_SESSION_ID, newTokenSettings.IdClient.ToString()),
+        _cacheService.PutInCache(string.Format(FormatConstantsCore.CFG_SESSION_ID, newTokenSettings.IdClient.ToString()),
             _cypherAes.AESEncryptionGCM(JsonSerializer.Serialize(new SessionCurrent()
             {
                 UserId = newTokenSettings.IdClient.ToString(),
@@ -175,13 +177,13 @@ public class SecurityService : ISecurityService
             rnd.NextBytes(newRefreshToken);
             tokenString = Convert.ToBase64String(newRefreshToken);
             var updateGuidToken = await _securityRepository.SaveRefreshToken(idToken, userName, _cypherAes.AESEncryptionGCM(tokenString), direccionIp, author);
-            updateIdToken = string.Format(MainConstantsLocal.CFG_JWT_ARRAYTOKENS, updateGuidToken.ToString(), MainConstantsCore.CFG_VALUE_PIPE, tokenString);
+            updateIdToken = string.Format(MainConstantsLocal.CFG_JWT_ARRAYTOKENS, updateGuidToken.ToString(), FormatConstantsCore.CFG_VALUE_PIPE, tokenString);
         }
         else
         {
             updateIdToken = await _securityRepository.SaveAndClearExpiration(idToken, userName, author);
-            var arrayTokens = updateIdToken.Split(MainConstantsCore.CFG_VALUE_PIPE);
-            updateIdToken = string.Format(MainConstantsLocal.CFG_JWT_ARRAYTOKENS, arrayTokens[0], MainConstantsCore.CFG_VALUE_PIPE, _cypherAes.AESDecryptionGCM(arrayTokens[1]));
+            var arrayTokens = updateIdToken.Split(FormatConstantsCore.CFG_VALUE_PIPE);
+            updateIdToken = string.Format(MainConstantsLocal.CFG_JWT_ARRAYTOKENS, arrayTokens[0], FormatConstantsCore.CFG_VALUE_PIPE, _cypherAes.AESDecryptionGCM(arrayTokens[1]));
         }
             
         return updateIdToken;

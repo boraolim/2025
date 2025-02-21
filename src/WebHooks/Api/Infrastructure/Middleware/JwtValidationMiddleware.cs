@@ -1,4 +1,6 @@
-﻿using Ardalis.GuardClauses;
+﻿using System.Text.RegularExpressions;
+
+using Ardalis.GuardClauses;
 
 using Core.Application.DTO;
 using Core.Application.Exceptions;
@@ -6,7 +8,9 @@ using Core.Application.Abstractions.Helpers;
 using Core.Application.Abstractions.Security;
 
 using MainConstantsCore = Core.Domain.Constants.MainConstants;
+using RegexConstantsCore = Core.Domain.Constants.RegexConstants;
 using MessageConstantsCore = Core.Domain.Constants.MessageConstants;
+using EnvironmentConstantsCore = Core.Domain.Constants.EnvironmentConstants;
 
 namespace WebHooks.Api.Infrastructure.Middleware;
 
@@ -29,7 +33,7 @@ public sealed class JwtValidationMiddleware : IMiddleware
 
     private void ReadValues()
     {
-        SecretKey = new string(_environmentReader.GetVariable(MainConstantsCore.CFG_BASE_KEY_WEBHOOK_APP)
+        SecretKey = new string(_environmentReader.GetVariable(EnvironmentConstantsCore.CFG_BASE_KEY_WEBHOOK_APP)
             .MessageDescription.ToArray());
         KeyAPILocal = new string(SecretKey.Take(32).ToArray());
     }
@@ -37,10 +41,16 @@ public sealed class JwtValidationMiddleware : IMiddleware
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         var authHeader = context.Request.Headers[MainConstantsCore.CFG_AUTHORIZATION_TAG].FirstOrDefault();
+        var bearerTokenRegex = new Regex(RegexConstantsCore.RGX_JWT_TOKEN, RegexOptions.Compiled);
 
-        if(!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith(MainConstantsCore.CFG_BEARER_TAG))
+        if(authHeader.StartsWith(MainConstantsCore.CFG_BEARER_TAG))
         {
+            if(!bearerTokenRegex.IsMatch(authHeader))
+                throw new JwtValidationException("El valor del token es un dato requerido");
+
             var token = authHeader.Substring(MainConstantsCore.CFG_BEARER_TAG.Length).Trim();
+              
+
             var validate = await _jwtService.ValidateTokenAsync(new JwtValidateDto { TokenValue = token, KeyAPI = KeyAPILocal });
 
             if (!validate.IsValid)

@@ -2,5 +2,5 @@
 
 public class TraceIdNotFoundException : Exception
 {
-    public TraceIdNotFoundException(string message) : base(message) { }
+    public TraceIdNotFoundException(string message) : base(message) { HResult = -53; }
 }

@@ -5,11 +5,13 @@ using FluentValidation;
 using Ardalis.GuardClauses;
 using Microsoft.IdentityModel.Tokens;
 
+using Core.Domain.Common;
 using Core.Application.Wrappers;
 using Core.Application.Exceptions;
 using Core.Application.Abstractions.Helpers;
 
 using MainConstantsCore = Core.Domain.Constants.MainConstants;
+using FormatConstantsCore = Core.Domain.Constants.FormatConstants;
 using MessageConstantsCore = Core.Domain.Constants.MessageConstants;
 
 namespace WebHooks.Api.Infrastructure.Middleware;
@@ -128,7 +130,7 @@ public sealed class ErrorHandlerMiddleware : IMiddleware
         catch(Exception ex)
         {
             return string.Concat(MessageConstantsCore.CFG_TEXT_RESULT_ERROR,
-                (ex.InnerException == null) ? ex.Message : string.Format(MainConstantsCore.CFG_SEPATOR_ERROR, 
+                (ex.InnerException.CheckIsNull()) ? ex.Message : string.Format(FormatConstantsCore.CFG_SEPATOR_ERROR, 
                     ex.Message, ex.InnerException.Message));
         }
     }
@@ -146,7 +148,7 @@ public sealed class ErrorHandlerMiddleware : IMiddleware
         catch(Exception ex)
         {
             return string.Concat(MessageConstantsCore.CFG_TEXT_RESULT_ERROR,
-                (ex.InnerException == null) ? ex.Message : string.Format(MainConstantsCore.CFG_SEPATOR_ERROR,
+                (ex.InnerException.CheckIsNull()) ? ex.Message : string.Format(FormatConstantsCore.CFG_SEPATOR_ERROR,
                     ex.Message, ex.InnerException.Message));
         }
     }

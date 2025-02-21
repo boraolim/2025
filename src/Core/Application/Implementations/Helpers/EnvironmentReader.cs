@@ -13,9 +13,8 @@ namespace Core.Application.Implementations.Helpers
     {
         public Result<string> GetVariable(string keyValue)
         {
-            var valueEnv = (Environment.OSVersion.Platform.ToString().Equals(MainConstantsCore.CFG_OS_PLATFORM_WIN)) ?
-                Environment.GetEnvironmentVariable(keyValue, EnvironmentVariableTarget.Machine) :
-                Environment.GetEnvironmentVariable(keyValue);
+            var valueEnv = Environment.GetEnvironmentVariable(keyValue, EnvironmentVariableTarget.Machine);
+
             if(string.IsNullOrEmpty(valueEnv))
                 return Result<string>.Failure(string.Format(MessageConstantsCore.MSG_ENVIRONMENT_VAR_NOT_FOUND, keyValue));
 
@@ -26,10 +25,7 @@ namespace Core.Application.Implementations.Helpers
         {
             return Result<string>.TryCatch(() =>
             {
-                var valueEnv = (Environment.OSVersion.Platform.ToString().Equals(MainConstantsCore.CFG_OS_PLATFORM_WIN)) ?
-                    Environment.GetEnvironmentVariable(keyValue, EnvironmentVariableTarget.Machine) :
-                    Environment.GetEnvironmentVariable(keyValue);
-                return valueEnv;
+                return Environment.GetEnvironmentVariable(keyValue, EnvironmentVariableTarget.Machine);
             }, string.Format(MessageConstantsCore.MSG_ENVIRONMENT_VAR_NOT_FOUND, keyValue));
         }
     }

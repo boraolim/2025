@@ -4,6 +4,7 @@ using WebHooks.Api.Infrastructure.Extensions;
 using WebHooks.Api.Infrastructure.Middleware;
 
 using MainConstantsCore = Core.Domain.Constants.MainConstants;
+using FormatConstantsCore = Core.Domain.Constants.FormatConstants;
 
 namespace WebHooks.Api.IoC;
 
@@ -16,7 +17,7 @@ public static class AppBuilderExtension
             app.UseDeveloperExceptionPage();
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint(string.Format(MainConstantsCore.CFG_SWAGGER_END_POINT, MainConstantsCore.CFG_API_VERSION_V1),
-                string.Format(MainConstantsCore.CFG_API_NAME, MainConstantsCore.CFG_API_VERSION_V1)));
+                string.Format(FormatConstantsCore.CFG_API_NAME, MainConstantsCore.CFG_API_VERSION_V1)));
         }
         else
         {

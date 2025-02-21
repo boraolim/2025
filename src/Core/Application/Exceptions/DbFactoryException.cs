@@ -2,5 +2,5 @@
 
 public class DbFactoryException : Exception
 {
-    public DbFactoryException(string message) : base(message) { }
+    public DbFactoryException(string message) : base(message) { HResult = -49; }
 }

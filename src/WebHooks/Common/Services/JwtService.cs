@@ -11,12 +11,13 @@ using Core.Application.DTO;
 using Core.Application.Settings;
 using Core.Application.Abstractions.Helpers;
 using Core.Application.Abstractions.Security;
-using Core.Application.Implementations.Helpers;
 using WebHooks.Application.Abstractions.Persistence;
 
-using MainConstantsCore = Core.Domain.Constants.MainConstants;
+using FormatConstantsCore = Core.Domain.Constants.FormatConstants;
 using MainConstantsLocal = WebHooks.Domain.Constants.MainConstants;
 using MessageConstantsCore = Core.Domain.Constants.MessageConstants;
+using EnvironmentConstantsCore = Core.Domain.Constants.EnvironmentConstants;
+
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace WebHooks.Common.Services;
@@ -46,7 +47,7 @@ public class JwtService : IJwtService
 
     private void ReadValues()
     {
-        SecretKey = new string(_environmentReader.GetVariable(MainConstantsCore.CFG_BASE_KEY_WEBHOOK_APP).MessageDescription.ToArray());
+        SecretKey = new string(_environmentReader.GetVariable(EnvironmentConstantsCore.CFG_BASE_KEY_WEBHOOK_APP).MessageDescription.ToArray());
         KeyAPILocal = new string(SecretKey.Take(32).ToArray());
     }
 
@@ -103,7 +104,7 @@ public class JwtService : IJwtService
         rnd.NextBytes(newRefreshToken);
         tokenString = Convert.ToBase64String(newRefreshToken);
         var idToken = await _securityRepository.SaveNewToken(_cypherAes.AESEncryptionGCM(tokenString), userName, direccionIp, author);
-        return string.Format(MainConstantsLocal.CFG_JWT_ARRAYTOKENS, idToken.ToString(), MainConstantsCore.CFG_VALUE_PIPE, tokenString);
+        return string.Format(MainConstantsLocal.CFG_JWT_ARRAYTOKENS, idToken.ToString(), FormatConstantsCore.CFG_VALUE_PIPE, tokenString);
     }
 
     public async Task<(Guid id, ClaimsPrincipal claims)> GetDetailFromTokenAsync(string Token) =>

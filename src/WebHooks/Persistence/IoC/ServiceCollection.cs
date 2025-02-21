@@ -1,16 +1,19 @@
 ﻿using System.Reflection;
 using System.Text.RegularExpressions;
 
-using Core.Domain.Common;
-using Core.Application.Utils;
-using Core.Infrastructure.Implementations;
-using Core.Application.Abstractions.Persistence;
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using Core.Domain.Common;
+using Core.Application.Utils;
+using Core.Infrastructure.Implementations;
+using Core.Application.Abstractions.Helpers;
+using Core.Application.Implementations.Helpers;
+using Core.Application.Abstractions.Persistence;
+
 using MainConstantsCore = Core.Domain.Constants.MainConstants;
 using RegexConstantsCore = Core.Domain.Constants.RegexConstants;
+using EnvironmentConstantsCore = Core.Domain.Constants.EnvironmentConstants;
 
 namespace WebHooks.Persistence.IoC;
 
@@ -18,15 +21,20 @@ public static class ServiceCollection
 {
     public static IServiceCollection AddWebHookPersistence(this IServiceCollection services, IConfiguration configuration)
     {
-        var isLocalEnvironment = Environment.GetEnvironmentVariable(MainConstantsCore.CFG_ENVIRONMENT_ASPNETCORE_NAME);
+        services.AddScoped<IDbFactory>(provider =>
+        {
+            var environmentReader = provider.GetRequiredService<IEnvironmentReader>();
+            var cypher = new CypherAes(new string(environmentReader.GetVariable(EnvironmentConstantsCore.CFG_BASE_KEY_WEBHOOK_APP).MessageDescription.Take(32).ToArray()));
+            var connectionString = Functions.GetEnvironmentConnectionString(cypher.AESDecryptionGCM(Environment.GetEnvironmentVariable(EnvironmentConstantsCore.CFG_BASE_KEY_DB_COONECTION)));
+            return new MySqlConnectorDbContext(connectionString);
+        });
 
-        var connectionString = (isLocalEnvironment.Equals(MainConstantsCore.CFG_ENVIRONMENT_LOCAL_NAME) ?
-            configuration.GetConnectionString(MainConstantsCore.CFG_CONNECTION_DB_NAME) :
-            Functions.GetEnvironmentConnectionString(Environment.GetEnvironmentVariable(MainConstantsCore.CFG_ENVIRONMENT_DATABASE_URL)))
-            ?? throw new ArgumentNullException(nameof(configuration));
-
-        services.AddScoped<IDbFactory>(provider => new MySqlConnectorDbContext(connectionString));
-        services.AddScoped<IUnitOfWork>(provider => new UnitOfWork(new MySqlConnectorDbContext(connectionString)));
+        services.AddScoped<IUnitOfWork>(provider => {
+            var environmentReader = provider.GetRequiredService<IEnvironmentReader>();
+            var cypher = new CypherAes(new string(environmentReader.GetVariable(EnvironmentConstantsCore.CFG_BASE_KEY_WEBHOOK_APP).MessageDescription.Take(32).ToArray()));
+            var connectionString = Functions.GetEnvironmentConnectionString(cypher.AESDecryptionGCM(Environment.GetEnvironmentVariable(EnvironmentConstantsCore.CFG_BASE_KEY_DB_COONECTION)));
+            return new UnitOfWork(new MySqlConnectorDbContext(connectionString));
+        });
 
         var _assembly = Assembly.GetExecutingAssembly();
         var _getRepositoryList = _assembly.GetTypes()

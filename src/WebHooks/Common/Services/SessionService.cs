@@ -9,7 +9,7 @@ using Core.Application.Abstractions.Helpers;
 using Core.Application.Abstractions.Security;
 using Core.Application.Abstractions.Management;
 
-using MainConstantsCore = Core.Domain.Constants.MainConstants;
+using FormatConstantsCore = Core.Domain.Constants.FormatConstants;
 using MainConstantsLocal = WebHooks.Domain.Constants.MainConstants;
 
 namespace WebHooks.Common.Services;
@@ -36,7 +36,7 @@ public class SessionService : ISessionService
 
     private void GetCurrentSesion()
     {
-        var ifExistById = _cacheService.TryOrGetFromCache(string.Format(MainConstantsCore.CFG_SESSION_ID, _currentUserService.UserId));
+        var ifExistById = _cacheService.TryOrGetFromCache(string.Format(FormatConstantsCore.CFG_SESSION_ID, _currentUserService.UserId));
 
         if(!ifExistById.CheckIsNull())
         {
@@ -55,7 +55,7 @@ public class SessionService : ISessionService
                 IpAddress = _currentUserService.IpAddress,
                 ExpiracionUtc = DateTimeUtils.GetDateFromLinuxDateTime(long.Parse(_currentUserService.Principal?.FindFirst(MainConstantsLocal.CFG_JWT_EXPIRATION_VALUE).Value, CultureInfo.InvariantCulture))
             };
-            _cacheService.PutInCache(string.Format(MainConstantsCore.CFG_SESSION_ID, _currentUserService.UserId),
+            _cacheService.PutInCache(string.Format(FormatConstantsCore.CFG_SESSION_ID, _currentUserService.UserId),
                 _cypherAes.AESEncryptionGCM(JsonSerializer.Serialize(SessionPresent, 
                 new JsonSerializerOptions { WriteIndented = true })));
         }

@@ -18,6 +18,8 @@ using WebHooks.Api.Infrastructure.Middleware;
 using Core.Application.Implementations.Helpers;
 
 using MainConstantsCore = Core.Domain.Constants.MainConstants;
+using FormatConstantsCore = Core.Domain.Constants.FormatConstants;
+using EnvironmentConstantsCore = Core.Domain.Constants.EnvironmentConstants;
 
 namespace WebHooks.Api.IoC;
 
@@ -36,8 +38,8 @@ public static class ConfigureServicesExtension
         services.AddScoped<ResilientActionFilter>();
 
         var environmentReader = new EnvironmentReader();
-        var jwtSettings = configuration.GetSection(MainConstantsCore.CFG_JWT_VALUES).Get<JwtSettings>();
-        var apiKeyEnv = new string(environmentReader.GetVariable(MainConstantsCore.CFG_BASE_KEY_WEBHOOK_APP).MessageDescription.Take(32).ToArray());
+        var jwtSettings = configuration.GetSection(EnvironmentConstantsCore.CFG_JWT_VALUES).Get<JwtSettings>();
+        var apiKeyEnv = new string(environmentReader.GetVariable(EnvironmentConstantsCore.CFG_BASE_KEY_WEBHOOK_APP).MessageDescription.Take(32).ToArray());
         var cifrado = new CypherAes(apiKeyEnv);
 
         byte[] TokenKeyWebApi;
@@ -73,7 +75,7 @@ public static class ConfigureServicesExtension
             options.ReportApiVersions = true;
         }).AddMvc().AddApiExplorer(options =>
         {
-            options.GroupNameFormat = MainConstantsCore.CFG_GROUP_NAME_FORMAT;
+            options.GroupNameFormat = FormatConstantsCore.CFG_GROUP_NAME_FORMAT;
             options.SubstituteApiVersionInUrl = true;
         });
 

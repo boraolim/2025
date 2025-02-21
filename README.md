@@ -1,18 +1,20 @@
-# Clean Architecture in .NET Core 7.0
+# Clean Architecture in .NET Core 8.0
 
-.Net Core Web API project to run on Linux or Mac, with the .NET Core compiler at version 6.0+ (it is currently compiled for .NET 7.0, at the time of this repository's creation). Soon this project will be migrated to .NET Core 8.0 or its most recent version.
+.Net Core Web API project to run on Windows, Linux or Mac, with the .NET Core compiler at version 8.0+ (it is currently compiled for .NET 8.0, at the time of this repository's creation).
 
 ## Characteristics:
 
 * **Entity Framework is not used** for Database access and fluent migration.
-* Using [Dapper] (https://www.nuget.org/packages/Dapper) for Data access with the DbFactory and UnitOfWork design pattern.
-* MariaDb or MySQL is used as the Database manager because it is the most used by developers due to its security levels and high performance. To connect to this database manager, [MySQLConnector] (https://www.nuget.org/packages/MySqlConnector) is used.
-* Use of [Fluent Migrator] (https://www.nuget.org/packages/FluentMigrator) when starting the WebApi project with fluent migration taking into account that Native SQL is used.
+* Using [Dapper](https://www.nuget.org/packages/Dapper) for Data access with the DbFactory and UnitOfWork design pattern.
+* MariaDb or MySQL is used as the Database manager because it is the most used by developers due to its security levels and high performance. To connect to this database manager, [MySQLConnector](https://www.nuget.org/packages/MySqlConnector) is used.
+* Use of [Fluent Migrator](https://www.nuget.org/packages/FluentMigrator) when starting the WebApi project with fluent migration taking into account that Native SQL is used.
 * Use of Cache.
 * Using Swagger for Local environment.
 * The use of AutoMapper is little, so native data mapping is used.
 * Use of SeriLog to log events in plain text file.
 * Using Docker to run Backend, MariaDb or MySql and REDIS application with Docker.
+* Using authentication and authorization via JWT Tokens.
+* Using resilience techniques for proper operation. 
 
 ## Prerequisites
 
@@ -20,7 +22,7 @@ Download and run the following script to install a recent version of .NET Core o
 
 ```
 $ sudo apt-get auto-remove -yq && sudo apt-get clean && sudo apt-get update -yq && sudo apt-get upgrade -yq
-$ sudo apt install dotnet6 -yq && sudo apt install dotnet7 -yq
+$ sudo apt install dotnet6 -yq && sudo apt install dotnet7 -yq && sudo apt install dotnet8 -yq
 $ sudo dotnet --version
 $ sudo dotnet --info
 ```
@@ -118,6 +120,43 @@ export DOTNET_ROOT=$HOME/.dotnet
 $ sudo nano /home/user/.bashrc
 export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
 ```
+## Required Environment Variables
+
+The KeyGenerator project, included in this repository, helps us create the main environment variables for the system to run correctly. By compiling it with this command:
+
+```
+$ sudo dotnet run --project KeyGenerator/KeyGenerator.csproj
+```
+
+We generate a JSON file with the following values:
+
+```
+{
+    "MainSecretEnv": "Seed for AES GCM encryption",
+    "DataBaseUrl": "Connection string to the Web API application database encrypted with AES GCM",
+    "RootPassword": "Password of the Web API root user to be stored in the tb_users table",
+    "ClientSecretKey": "Client name secret value for JWT",
+    "Issuer": "Issuer value for JWT",
+    "Audience": "Audience value for JWT"
+}
+```
+The first two values ​​must be used as system environment variables in the local operating system or Docker container under the following names:
+
+```
+key_MAIN_SECRET_API = "Value from 'MainSecretEnv'"
+key_MAIN_SECRET_DB_CONN = "Value from 'DataBaseUrl'"
+```
+
+The last three values ​​must be saved in the AppSettings.json file of the Web API application:
+
+```
+{
+    "ClientSecretKey": "Your client JWT here...",
+    "Issuer": "Your issuer here...",
+    "Audience": "Your audiencie here..."
+}
+```
+With these settings, the application is ready to run correctly.
 
 ## Database Configuration in a Local environment
 

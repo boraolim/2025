@@ -11,6 +11,7 @@ using Core.Application.Abstractions.Security;
 
 using MainConstantsCore = Core.Domain.Constants.MainConstants;
 using MainConstantsLocal = WebHooks.Domain.Constants.MainConstants;
+using EnvironmentConstantsCore = Core.Domain.Constants.EnvironmentConstants;
 
 namespace WebHooks.Common.Services;
 
@@ -35,7 +36,7 @@ public class CurrentUserService : ICurrentUserService
 
     private void ReadValues()
     {
-        SecretKey = new string(_environmentReader.GetVariable(MainConstantsCore.CFG_BASE_KEY_WEBHOOK_APP).MessageDescription.ToArray());
+        SecretKey = new string(_environmentReader.GetVariable(EnvironmentConstantsCore.CFG_BASE_KEY_WEBHOOK_APP).MessageDescription.ToArray());
         KeyAPILocal = new string(SecretKey.Take(32).ToArray());
     }
 

@@ -1,5 +1,4 @@
-namespace Core.Application.Settings;
-
+﻿namespace Core.Application.Settings;
 public class PollySettings
 {
     public string BaseUrl { get; set; }
